@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:context="http://www.springframework.org/schema/context"
+
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+       http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-4.1.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.1.xsd
+">
+	
+	<!-- 注入spring boot无法扫描到的bean. -->
+	<bean id="helloService" class="org.kfit.service.HelloService"></bean>
+	<context:property-placeholder location="classpath*:netty-config.properties" ignore-unresolvable="true"/>
+	<context:annotation-config/>
+	<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+		<property name="caches">
+			<set>
+				<bean name="messageCache" class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"/>
+			</set>
+		</property>
+	</bean>
+
+
+	<bean id="tcpBossThreadFactory" class="cn.com.reformer.netty.concurrent.NamedThreadFactory">
+		<constructor-arg type="java.lang.String" value="carLock-Server-Boss"/>
+	</bean>
+
+	<bean id="tcpWorkerThreadFactory" class="cn.com.reformer.netty.concurrent.NamedThreadFactory">
+		<constructor-arg type="java.lang.String" index="0" value="carLock-Server-Worker"/>
+	</bean>
+
+
+	<util:map id="tcpChildOptions" map-class="java.util.HashMap">
+		<entry>
+			<key>
+				<util:constant static-field="io.netty.channel.ChannelOption.SO_KEEPALIVE"/>
+			</key>
+			<value type="java.lang.Boolean">${knight.tcpserver.keepalive}</value>
+		</entry>
+		<entry>
+			<key>
+				<util:constant static-field="io.netty.channel.ChannelOption.TCP_NODELAY"/>
+			</key>
+
+			<value type="java.lang.Boolean">${knight.tcpserver.nodelay}</value>
+		</entry>
+		<entry>
+			<key>
+				<util:constant static-field="io.netty.channel.ChannelOption.SO_SNDBUF"/>
+			</key>
+
+			<value type="java.lang.Integer">2048</value>
+		</entry>
+		<entry>
+			<key>
+				<util:constant static-field="io.netty.channel.ChannelOption.SO_RCVBUF"/>
+			</key>
+
+			<value type="java.lang.Integer">2048</value>
+		</entry>
+	</util:map>
+	<bean id="tcpBossGroup" class="io.netty.channel.nio.NioEventLoopGroup" destroy-method="shutdownGracefully">
+		<constructor-arg type="int" index="0" value="1"/>
+		<constructor-arg index="1" ref="tcpBossThreadFactory"/>
+	</bean>
+
+	<bean id="tcpWorkerGroup" class="io.netty.channel.nio.NioEventLoopGroup" destroy-method="shutdownGracefully">
+		<constructor-arg type="int" index="0" value="5"/>
+		<constructor-arg index="1" ref="tcpWorkerThreadFactory"/>
+	</bean>
+
+	<bean id="tcpConfig" class="cn.com.reformer.netty.server.NettyConfig">
+		<property name="channelOptions" ref="tcpChildOptions"/>
+		<property name="bossGroup" ref="tcpBossGroup"/>
+		<property name="workerGroup" ref="tcpWorkerGroup"/>
+		<property name="portNumber" value="${knight.carLock.tcpserver.port}"/>
+	</bean>
+
+	<bean id="msgHandlerGroup" class="io.netty.util.concurrent.DefaultEventExecutorGroup">
+		<constructor-arg index="0" type="int" value="${knight.business.handler.thread}"></constructor-arg>
+	</bean>
+	<context:property-placeholder location="classpath*:netty-config.properties" ignore-unresolvable="true"/>
+
+	<!-- 客户端更新二维码-->
+	<bean id="handler0X01" class="cn.com.reformer.netty.handler.Handler0x01"></bean>
+	<!-- 心跳同步-->
+	<bean id="handler0X02" class="cn.com.reformer.netty.handler.Handler0x02"></bean>
+	<!-- 客户端通用应答-->
+	<bean id="handler0X03" class="cn.com.reformer.netty.handler.Handler0x03"></bean>
+	<bean id="handler0X04" class="cn.com.reformer.netty.handler.Handler0x04"></bean>
+	<!-- 客户端通用应答-->
+	<bean id="handler0X05" class="cn.com.reformer.netty.handler.Handler0x05"></bean>
+	<!-- 请求分发工厂类-->
+	<bean id="handlerFactory" class="cn.com.reformer.netty.handler.HandlerFactory"></bean>
+	<!-- netty 服务处理类-->
+	<bean id="tcpMessageHandler" class="cn.com.reformer.netty.handler.TCPMessageHandler" scope="singleton"/>
+	<!-- 线程池（处理消息）管理-->
+	<bean id="parseMsgThreadManager" class="cn.com.reformer.netty.server.thread.ParseMsgThreadManager"
+		  init-method="run">
+		<constructor-arg index="0" value="${ParseCorePoolSize}"/>
+		<constructor-arg index="1" value="${ParseMaximumPoolSize}"/>
+		<constructor-arg index="2" value="${ParseKeepAliveTime}"/>
+		<constructor-arg index="3" value="${ParseQueueSize}"/>
+		<property name="handlerFactory" ref="handlerFactory"></property>
+	</bean>
+	<bean id="clientManager" class="cn.com.reformer.netty.util.msg.ClientManager">
+		<property name="heartbeatDelay" value="${tcp.heartbeatdelay}"></property>
+	</bean>
+	<!--启动客户端检查线程-->
+	<bean id="checkClientThread" class="cn.com.reformer.netty.server.thread.CheckClientThread" init-method="runThread">
+		<property name="clientdelay" value="${tcp.clientdelay}"></property>
+		<property name="period" value="${tcp.clientperiod}"></property>
+	</bean>
+	<!-- 启动临时客户端管理(秒)-->
+	<bean id="checkTemClientThread" class="cn.com.reformer.netty.server.thread.CheckTemClientThread"
+		  init-method="runThread">
+		<property name="delay" value="${tcp.temclientdelay}"></property>
+		<property name="period" value="${tcp.temclientperiod}"></property>
+	</bean>
+
+	<bean id="tcpServer" class="cn.com.reformer.netty.server.TCPServer" init-method="startServer"
+		  destroy-method="stopServer">
+		<constructor-arg ref="tcpConfig"/>
+		<constructor-arg ref="tcpChannelInitializer"/>
+	</bean>
+	<bean id="tcpChannelInitializer" class="cn.com.reformer.netty.server.TCPServerChannelInitializer"></bean>
+
+
+	<bean id="tcpMessageSender" class="cn.com.reformer.netty.communication.CarLockTcpMessageSender"></bean>
+	<bean id="eventBus" class="com.google.common.eventbus.EventBus"/>
+</beans>
