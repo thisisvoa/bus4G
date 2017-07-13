@@ -17,6 +17,7 @@ public class MSG_0x05 extends BaseParam {
     private static final long serialVersionUID = 1L;
 
     private  String qrdata;
+    private Integer result;
 
 
     public String getQrdata() {
@@ -31,5 +32,11 @@ public class MSG_0x05 extends BaseParam {
         return MessageID.MSG_0x05;
     }
 
+    public Integer getResult() {
+        return result;
+    }
 
+    public void setResult(Integer result) {
+        this.result = result;
+    }
 }

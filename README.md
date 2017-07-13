@@ -10,7 +10,7 @@
 1.采用技术：netty+spring+springboot
 </li>
 <li>
-2.项目采用netty作为车位锁的服务
+2.项目采用netty作为班车pos的服务
 </li>
 <li>
 3.项目类管理采用了spring

@@ -2,6 +2,7 @@ package cn.com.reformer.netty.communication;
 
 import cn.com.reformer.netty.bean.BaseParam;
 import cn.com.reformer.netty.bean.Client;
+import cn.com.reformer.netty.msg.MSG_0x05;
 import cn.com.reformer.netty.msg.MSG_0x06;
 import cn.com.reformer.netty.util.SignUtils;
 import cn.com.reformer.netty.util.msg.ClientManager;
@@ -140,6 +141,7 @@ public class CarLockTcpMessageSender extends TCPMessageSender {
         MSG_0x06 baseParam=new MSG_0x06();
         baseParam.setSn(sn);
         baseParam.setCmd(cmd);
+        baseParam.setType((byte) 0x02);
         int randomDig=nextInt(10000,100000);
         baseParam.setNonce(String.valueOf(randomDig));
         baseParam.setSign(SignUtils.getSigin(sn, cmd, String.valueOf(randomDig)));
@@ -149,6 +151,7 @@ public class CarLockTcpMessageSender extends TCPMessageSender {
     private BaseParam createBaseParam(String sn) {
         byte cmd=0x02;
         BaseParam baseParam=new BaseParam();
+        baseParam.setType((byte) 0x02);
         baseParam.setSn(sn);
         baseParam.setCmd(cmd);
         int randomDig=nextInt(10000,100000);
@@ -158,12 +161,13 @@ public class CarLockTcpMessageSender extends TCPMessageSender {
     }
     private BaseParam createQrBaseParam(String sn) {
         byte cmd=0x05;
-        BaseParam baseParam=new BaseParam();
+        MSG_0x05 baseParam=new MSG_0x05();
         baseParam.setSn(sn);
         baseParam.setCmd(cmd);
         baseParam.setType((byte) 0x02);
         int randomDig=nextInt(10000,100000);
         baseParam.setNonce(String.valueOf(randomDig));
+        baseParam.setResult(0);
         baseParam.setSign(SignUtils.getSigin(sn, cmd, String.valueOf(randomDig)));
         return baseParam;
     }
