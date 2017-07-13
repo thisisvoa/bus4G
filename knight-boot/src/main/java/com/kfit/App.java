@@ -79,6 +79,12 @@ public class App {
         carLockTcpMessageSender.openDoor(sn);
         return "open success";
     }
+    @RequestMapping(value = "/face", method = RequestMethod.POST)
+    @ResponseBody
+    public String face(String sn,Integer num) {
+        carLockTcpMessageSender.face(sn,num);
+        return "open success";
+    }
     @RequestMapping(value = "/handlerQrcode", method = RequestMethod.GET)
     @ResponseBody
     public String handlerQrcode(String sn) {

@@ -31,6 +31,10 @@ public class MessageID {
      */
     public static final byte MSG_0x05 = 0x05;
     /**
+     * （3）控制屏显示
+     */
+    public static final byte MSG_0x06 = 0x06;
+    /**
      * 服务端端通用返回指令*
      */
     public static final byte MSG_0x3003 = 0x33;

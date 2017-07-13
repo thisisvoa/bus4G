@@ -20,6 +20,7 @@
         <td>设备IP和端口</td>
         <td>设备类型</td>
         <td>发送开启指令 || 查询状态</td>
+        <td>发送屏幕显示</td>
         </thead>
 
         <tr th:each="user : ${tcpUserList}">
@@ -27,6 +28,11 @@
             <td th:text="${user.ipAndPort}">Red chair</td>
             <td th:text="${user.type}">$350</td>
            <td> <a  target="_blank" th:href="@{/handlerQrcode(sn=${user.sn})}">发送收费成功指令</a>||  <a  target="_blank"   th:href="@{/getStatus(sn=${user.sn})}">查询状态</a></td>
+            <td> <form method="post" action="./face">
+                sn: <input id="sn" type="text"  th:value="${user.sn}" name="sn"/>
+                num: <input id="num" type="text" name="num"/>
+                <input type="submit" value="Submit" />
+            </form> </td>
         </tr>
 
     </table>

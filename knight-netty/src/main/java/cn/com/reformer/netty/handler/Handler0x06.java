@@ -2,8 +2,8 @@ package cn.com.reformer.netty.handler;
 
 import cn.com.reformer.netty.adapter.TCPMessageHandlerAdapter;
 import cn.com.reformer.netty.bean.BaseParam;
-import cn.com.reformer.netty.event.handler.IUploadHandler;
 import cn.com.reformer.netty.msg.MSG_0x05;
+import cn.com.reformer.netty.msg.MSG_0x06;
 import com.google.common.eventbus.EventBus;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -16,17 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zhangjin
  * @create 2017-05-08
 **/
-public class Handler0x05 extends TCPMessageHandlerAdapter {
+public class Handler0x06 extends TCPMessageHandlerAdapter {
 
-    Logger logger = LoggerFactory.getLogger(Handler0x05.class);
+    Logger logger = LoggerFactory.getLogger(Handler0x06.class);
 
-    @Autowired(required = true)
-    private EventBus eventBus;
+
 
     public void doHandle(BaseParam m, ChannelHandlerContext ctx) {
         try {
-            if (m instanceof MSG_0x05) {
-                MSG_0x05 msg = (MSG_0x05) m;
+            if (m instanceof MSG_0x06) {
+                MSG_0x06 msg = (MSG_0x06) m;
 
 
                // eventBus.post(msg);
@@ -39,11 +38,5 @@ public class Handler0x05 extends TCPMessageHandlerAdapter {
         }
     }
 
-    public EventBus getEventBus() {
-        return eventBus;
-    }
 
-    public void setEventBus(EventBus eventBus) {
-        this.eventBus = eventBus;
-    }
 }
