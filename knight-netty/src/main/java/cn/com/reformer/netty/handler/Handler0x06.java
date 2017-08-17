@@ -27,6 +27,9 @@ public class Handler0x06 extends TCPMessageHandlerAdapter {
             if (m instanceof MSG_0x06) {
                 MSG_0x06 msg = (MSG_0x06) m;
 
+                System.out.println("______________return time_______________");
+                System.out.println(System.currentTimeMillis());
+                System.out.println(msg.toString());
 
                // eventBus.post(msg);
 //                MsgCache.getInstance().remove(msg.getHead() + ";" + msg.getHead().getSeq());

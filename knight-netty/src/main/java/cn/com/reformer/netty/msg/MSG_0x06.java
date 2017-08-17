@@ -40,4 +40,12 @@ public class MSG_0x06 extends BaseParam {
     public void setFace(Integer face) {
         this.face = face;
     }
+
+    @Override
+    public String toString() {
+        return "MSG_0x06{" +
+                "qrdata='" + qrdata + '\'' +
+                ", face=" + face +
+                '}';
+    }
 }

@@ -8,11 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- *  Copyright 2017 the original author or authors hangzhou Reformer 
- * @Description: ${todo}(这里用一句话描述这个类的作用)
+ * Copyright 2017 the original author or authors hangzhou Reformer
+ *
  * @author zhangjin
+ * @Description: ${todo}(这里用一句话描述这个类的作用)
  * @create 2017-05-08
-**/
+ **/
 public class HandlerFactory {
 
     @Autowired
@@ -23,13 +24,15 @@ public class HandlerFactory {
     private Handler0x02 handler0X02;
 
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     private Handler0x03 handler0x03;
-    @Autowired(required=true)
+    @Autowired(required = true)
     private Handler0x04 handler0x04;
-    @Autowired(required=true)
+    @Autowired(required = true)
     private Handler0x05 handler0x05;
 
+    @Autowired(required = true)
+    private Handler0x06 handler0x06;
 
     private static final Logger logger = LoggerFactory.getLogger(HandlerFactory.class);
 
@@ -56,6 +59,9 @@ public class HandlerFactory {
                 break;
             case MessageID.MSG_0x05:
                 h = handler0x05;
+                break;
+            case MessageID.MSG_0x06:
+                h = handler0x06;
                 break;
             default:
                 break;
@@ -101,5 +107,13 @@ public class HandlerFactory {
 
     public void setHandler0x05(Handler0x05 handler0x05) {
         this.handler0x05 = handler0x05;
+    }
+
+    public Handler0x06 getHandler0x06() {
+        return handler0x06;
+    }
+
+    public void setHandler0x06(Handler0x06 handler0x06) {
+        this.handler0x06 = handler0x06;
     }
 }
