@@ -17,10 +17,10 @@ public class WsController {
 
     @MessageMapping("/welcome")
     @SendTo("/topic/getResponse")
-    public ResponseMessage say() {
+    public ResponseMessage say(String name) {
 
 
-            return new ResponseMessage("welcome," + " !");
+            return new ResponseMessage("welcome," + " !"+name);
     }
     @SendTo("/topic/getResponse2")
     public ResponseMessage say2() {

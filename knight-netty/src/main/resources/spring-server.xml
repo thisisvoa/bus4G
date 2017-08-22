@@ -22,7 +22,6 @@
         </property>
     </bean>
 
-
     <bean id="tcpBossThreadFactory" class="cn.com.reformer.netty.concurrent.NamedThreadFactory">
         <constructor-arg type="java.lang.String" value="carLock-Server-Boss"/>
     </bean>

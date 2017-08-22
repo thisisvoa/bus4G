@@ -19,6 +19,9 @@ public class MSG_0x06 extends BaseParam {
     private  String qrdata;
     private Integer face;
 
+    private Long  endTime;
+
+    private String strEndTime;
 
 
     public String getQrdata() {
@@ -41,11 +44,21 @@ public class MSG_0x06 extends BaseParam {
         this.face = face;
     }
 
-    @Override
-    public String toString() {
-        return "MSG_0x06{" +
-                "qrdata='" + qrdata + '\'' +
-                ", face=" + face +
-                '}';
+    public Long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Long endTime) {
+        this.endTime = endTime;
+    }
+
+
+
+    public String getStrEndTime() {
+        return strEndTime;
+    }
+
+    public void setStrEndTime(String strEndTime) {
+        this.strEndTime = strEndTime;
     }
 }

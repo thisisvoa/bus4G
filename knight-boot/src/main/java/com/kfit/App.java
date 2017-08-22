@@ -4,16 +4,24 @@ import cn.com.reformer.netty.bean.Client;
 import cn.com.reformer.netty.bean.TcpUser;
 import cn.com.reformer.netty.bean.TcpUserVO;
 import cn.com.reformer.netty.communication.CarLockTcpMessageSender;
+import cn.com.reformer.netty.guava.SimpleListener;
+import com.kfit.service.*;
+import com.kfit.service.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,6 +43,10 @@ public class App {
 
     @Autowired
     private CarLockTcpMessageSender carLockTcpMessageSender;
+    @Autowired
+    SimpleListener simpleListener;
+    @Resource
+    SimpMessagingTemplate simpMessagingTemplate;
 
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
     public String hello(Model model) {
@@ -45,28 +57,28 @@ public class App {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public String list(Model model) {
 
-        ConcurrentHashMap<String, Client> clientConcurrentHashMap= carLockTcpMessageSender.getClientManager().getClientMap();
-        List<TcpUser> tcpUserList=new ArrayList<TcpUser>();
+        ConcurrentHashMap<String, Client> clientConcurrentHashMap = carLockTcpMessageSender.getClientManager().getClientMap();
+        List<TcpUser> tcpUserList = new ArrayList<TcpUser>();
         Iterator iter = clientConcurrentHashMap.entrySet().iterator();
-        StringBuffer sb=new StringBuffer();
-         while (iter.hasNext()) {
+        StringBuffer sb = new StringBuffer();
+        while (iter.hasNext()) {
             Map.Entry entry = (Map.Entry) iter.next();
             Object key = entry.getKey();
             Object val = entry.getValue();
-             Client user= (Client) val;
-             if(null !=user) {
-                 TcpUser user1 = user.getUser();
-                 TcpUserVO vo=new TcpUserVO();
-                 vo.setSn(user1.getSn());
-                 vo.setType(user1.getType());
-                 vo.setIpAndPort(key.toString());
-                 tcpUserList.add(vo);
-                 sb.append("clientId:" + key + "---" + "TcpUser:" + user1.getSn());
-             }
+            Client user = (Client) val;
+            if (null != user) {
+                TcpUser user1 = user.getUser();
+                TcpUserVO vo = new TcpUserVO();
+                vo.setSn(user1.getSn());
+                vo.setType(user1.getType());
+                vo.setIpAndPort(key.toString());
+                tcpUserList.add(vo);
+                sb.append("clientId:" + key + "---" + "TcpUser:" + user1.getSn());
+            }
 
-             sb.append("<br>");
-             }
-       // model.addAttribute("list", sb);
+            sb.append("<br>");
+        }
+        // model.addAttribute("list", sb);
         model.addAttribute("tcpUserList", tcpUserList);
 
         return "list";
@@ -79,17 +91,27 @@ public class App {
         carLockTcpMessageSender.openDoor(sn);
         return "open success";
     }
-    @RequestMapping(value = "/face", method = RequestMethod.POST)
+
+    // @MessageMapping("/face")
+    // @SendTo("/topic/getResponse")
+    @RequestMapping(value = "/face", method = RequestMethod.GET)
     @ResponseBody
-    public String face(String sn,Integer num) {
-        carLockTcpMessageSender.face(sn,num);
-        return "open success";
+    public Map<String, Object> face(String sn, Integer num) {
+        carLockTcpMessageSender.face(sn, num);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");//设置日期格式
+        Date date1 = new Date();
+        String date = df.format(date1);// new Date()为获取当前系统时间，也可使用当前时间戳
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("startTime", date);
+        map.put("startLong", date1.getTime());
+        return map;
+        // return  new ResponseMessage("test");
     }
+
     @RequestMapping(value = "/handlerQrcode", method = RequestMethod.GET)
     @ResponseBody
-    public String handlerQrcode(String sn) {
+    public void handlerQrcode(String sn) {
         carLockTcpMessageSender.handlerQrcode(sn);
-        return "open success";
     }
 
     @RequestMapping(value = "/getStatus", method = RequestMethod.GET)
@@ -128,4 +150,6 @@ public class App {
     public static void main(String[] args) {
         SpringApplication.run(App.class, args);
     }
+
+
 }

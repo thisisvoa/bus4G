@@ -6,6 +6,7 @@
     <script th:src="@{js/sockjs.min.js}"></script>
     <script th:src="@{js/stomp.js}"></script>
     <script th:src="@{js/jquery-3.1.1.js}"></script>
+
 </head>
 <body>
 
@@ -28,11 +29,11 @@
             <td th:text="${user.ipAndPort}">Red chair</td>
             <td th:text="${user.type}">$350</td>
            <td> <a  target="_blank" th:href="@{/handlerQrcode(sn=${user.sn})}">发送收费成功指令</a>||  <a  target="_blank"   th:href="@{/getStatus(sn=${user.sn})}">查询状态</a></td>
-            <td> <form method="post" action="./face">
+            <td>
                 sn: <input id="sn" type="text"  th:value="${user.sn}" name="sn"/>
                 num: <input id="num" type="text" name="num"/>
-                <input type="submit" value="Submit" />
-            </form> </td>
+                <input type="submit" value="Submit" onclick="sendface()"/>
+              </td>
         </tr>
 
     </table>
@@ -41,11 +42,16 @@
         <button id="connect" onclick="connect();">连接</button>
         <button id="disconnect" disabled="disabled" onclick="disconnect();">断开连接</button>
     </div>
-    <div id="conversationDiv">
+   <!-- <div id="conversationDiv">
         <label>输入你的名字</label><input type="text" id="name"/>
         <button id="sendName" onclick="sendName();">发送</button>
-        <p id="response"></p>
-    </div>
+
+    </div>-->
+    开始时间（毫秒）：<input id="sendL" type="text"/>
+    <p id="sendtime"></p>
+    结束时间（毫秒）：   <input id="responseL" type="text"/>
+    <p id="response"></p>
+    <input id="time" type="text"/>
 </div>
 
 <script type="text/javascript">
@@ -53,7 +59,7 @@
     function setConnected(connected) {
         document.getElementById("connect").disabled = connected;
         document.getElementById("disconnect").disabled = !connected;
-        document.getElementById("conversationDiv").style.visibility = connected ? 'visible' : 'hidden';
+      //  document.getElementById("conversationDiv").style.visibility = connected ? 'visible' : 'hidden';
 //        $("#connect").disabled = connected;
 //        $("#disconnect").disabled = !connected;
         $("#response").html();
@@ -65,10 +71,12 @@
             setConnected(true);
             console.log('Connected:' + frame);
             stompClient.subscribe('/topic/getResponse', function (response) {
-                showResponse(JSON.parse(response.body).responseMessage);
+                showResponse((response.body));
             })
         });
     }
+
+
     function disconnect() {
         if (stompClient != null) {
             stompClient.disconnect();
@@ -81,8 +89,36 @@
         console.log('name:' + name);
         stompClient.send("/welcome", {}, JSON.stringify({'name': name}));
     }
+
+    function sendErCode() {
+        var name = $('#name').val();
+        console.log('name:' + name);
+        stompClient.send("/welcome", {}, JSON.stringify({'name': name}));
+    }
     function showResponse(message) {
         $("#response").html(message);
+        var json=JSON.parse(message);
+        $("#responseL").val(json.endTime);
+
+        var start=$("#sendL").val();
+        var end= $("#responseL").val();
+        $("#time").val(start-end);
+    }
+
+    function sendface() {
+
+
+        var sn_val=$("*[id='sn']").val();
+        var num_val=$("*[id='num']").val();
+
+        var dd={"sn":sn_val,
+            "num":num_val};
+        $.get("/face",dd,function(data,status){
+          //  alert("Data: " + data + "\nStatus: " + status);
+            $("#sendtime").html(data.startTime);
+            $("#sendL").val(data.startLong);
+        });
+
     }
 </script>
 
