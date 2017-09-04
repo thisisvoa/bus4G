@@ -97,10 +97,11 @@ public class App {
     @RequestMapping(value = "/face", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> face(String sn, Integer num) {
-        carLockTcpMessageSender.face(sn, num);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");//设置日期格式
         Date date1 = new Date();
         String date = df.format(date1);// new Date()为获取当前系统时间，也可使用当前时间戳
+        System.out.println("startTime:"+date);
+        carLockTcpMessageSender.face(sn, num);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("startTime", date);
         map.put("startLong", date1.getTime());

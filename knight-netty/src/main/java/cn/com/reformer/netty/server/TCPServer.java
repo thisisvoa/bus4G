@@ -64,6 +64,7 @@ public class TCPServer extends AbstractServer {
 
             serverBootstrap.group(getBossGroup(), getWorkerGroup())
                     .channel(NioServerSocketChannel.class)
+
                     .childHandler(getChannelInitializer())
                     .handler(new LoggingHandler(LogLevel.INFO));
             final ChannelFuture cf = serverBootstrap.bind(nettyConfig.getSocketAddress());

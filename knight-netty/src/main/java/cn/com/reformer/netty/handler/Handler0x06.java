@@ -34,16 +34,17 @@ public class Handler0x06 extends TCPMessageHandlerAdapter {
 
 
     public void doHandle(BaseParam m, ChannelHandlerContext ctx) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");//设置日期格式
+        Date date1 = new Date();
+        String date = df.format(date1);// new Date()为获取当前系统时间，也可使用当前时间戳
         try {
             if (m instanceof MSG_0x06) {
                 MSG_0x06 msg = (MSG_0x06) m;
 
                 System.out.println("______________return time_______________");
-                System.out.println(System.currentTimeMillis());
+                System.out.println(date1.getTime());
                 System.out.println(msg.toString());
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");//设置日期格式
-                Date date1 = new Date();
-                String date = df.format(date1);// new Date()为获取当前系统时间，也可使用当前时间戳
+
                 msg.setEndTime(date1.getTime());
                 msg.setStrEndTime(date);
                 String event =  new Gson().toJson(msg) ;
@@ -54,9 +55,7 @@ public class Handler0x06 extends TCPMessageHandlerAdapter {
 //                MsgCache.getInstance().remove(msg.getHead() + ";" + msg.getHead().getSeq());
             } else {
                 MSG_0x06 msg = (MSG_0x06) m;
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");//设置日期格式
-                Date date1 = new Date();
-                String date = df.format(date1);// new Date()为获取当前系统时间，也可使用当前时间戳
+
                 msg.setEndTime(date1.getTime());
                 msg.setStrEndTime(date);
                 String event = msg.toString() ;
@@ -66,6 +65,7 @@ public class Handler0x06 extends TCPMessageHandlerAdapter {
             }
         } catch (Exception e) {
             logger.error("handler common reply fail" + e);
+            e.printStackTrace();
         }
     }
 
