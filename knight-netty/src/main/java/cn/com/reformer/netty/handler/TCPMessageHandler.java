@@ -34,6 +34,7 @@ public class TCPMessageHandler extends SimpleChannelInboundHandler <String>{
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
 
         System.out.println("收到数据" + msg.toString());
+        byte[] bb=msg.getBytes("UTF8");
         BaseParam bpg=null;
         Gson g=new Gson();
         try{
@@ -69,6 +70,7 @@ public class TCPMessageHandler extends SimpleChannelInboundHandler <String>{
 
         }catch(Exception e){
             LOG.error(String.valueOf("发送的数据格式有误请重新发送".getBytes("UTF-8")));
+            LOG.error(e.toString());
 
         }
 

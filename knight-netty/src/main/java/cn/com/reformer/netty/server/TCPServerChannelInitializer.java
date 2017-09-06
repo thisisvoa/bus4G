@@ -1,6 +1,10 @@
 package cn.com.reformer.netty.server;
 
+import cn.com.reformer.netty.decode.StrDecoder;
+import cn.com.reformer.netty.encode.StrEncoder;
 import cn.com.reformer.netty.handler.TCPMessageHandler;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -23,12 +27,13 @@ public class TCPServerChannelInitializer extends ChannelInitializer<SocketChanne
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast("tcpMsgEncoder", new StringEncoder());
-        LineBasedFrameDecoder decoder = new LineBasedFrameDecoder(1500);
+        pipeline.addLast("tcpMsgEncoder", new StrEncoder());
+        ByteBuf delimiter = Unpooled.copiedBuffer("\n\r".getBytes());
+        DelimiterBasedFrameDecoder decoder = new DelimiterBasedFrameDecoder(1500,delimiter);
+        pipeline.addLast("decoder", decoder);
         pipeline.addLast("tcpMsgDecoder", new StringDecoder());
         pipeline.addLast("tcpMsgHandler", tcpMessageHandler);
         //每出现换行符自动拆包，设置最大长度为1024个字节。
 
-        pipeline.addLast("decoder", decoder);
     }
 }

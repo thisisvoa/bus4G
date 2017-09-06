@@ -29,10 +29,19 @@ public class SignUtils {
         _temp_crc[9]=cmd;
         System.arraycopy(nonce_byte, 0, _temp_crc, 10, 4);
 
-        String crc = getCRC(_temp_crc);
 
-        byte[] src = hexStringToBytes(crc);
-        System.arraycopy(src, 0, ret, 14, 2);
+        byte[] src = getCRC(_temp_crc);
+        try {
+
+            if(src.length==1){
+                System.arraycopy(src, 0, ret, 14, 1);
+            }
+            if(src.length==2){
+                System.arraycopy(src, 0, ret, 14, 2);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         try {
             String bytes2Hex = bytes2Hex(ret);
             System.out.println(bytes2Hex);
@@ -65,7 +74,7 @@ public class SignUtils {
      * @return {@link String} 校验码
      * @since 1.0
      */
-    public static String getCRC(byte[] bytes) {
+    public static byte[] getCRC(byte[] bytes) {
         int crc = 0x00;          // initial value
         int polynomial = 0x1021;
         for (int index = 0 ; index< bytes.length; index++) {
@@ -79,7 +88,15 @@ public class SignUtils {
         }
         crc &= 0xffff;
 
-        return Integer.toHexString(crc);
+        byte[] bytes1 = int2Bytes(crc, 2);
+        return bytes1;
+    }
+    public static byte[] int2Bytes(int value, int len) {
+        byte[] b = new byte[len];
+        for (int i = 0; i < len; i++) {
+            b[len - i - 1] = (byte)((value >> 8 * i) & 0xff);
+        }
+        return b;
     }
     /**
      * byte数组转hex字符串<br/>
